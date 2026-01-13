@@ -77,6 +77,12 @@ async function cancelar(i) {
     mode: "no-cors",
     body: JSON.stringify(i)
   });
+  function logout() {
+  sessionStorage.removeItem("admin");
+  location.reload();
+}
+
 
   carregarTudo();
 }
+
