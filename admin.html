@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin | Reservas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+
+  <div id="login">
+    <h1>Administração</h1>
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Entrar</button>
+  </div>
+
+  <div id="painel" style="display:none">
+    <h1>Painel de Reservas</h1>
+
+    <h2>Nova Reserva Manual ✍️</h2>
+    <form id="manualForm">
+      <input type="text" id="m_nome" placeholder="Nome" required>
+      <input type="tel" id="m_telefone" placeholder="Telefone">
+      <input type="date" id="m_data" required>
+
+      <select id="m_refeicao" required>
+        <option value="">Refeição</option>
+        <option value="almoco">Almoço</option>
+        <option value="jantar">Jantar</option>
+      </select>
+
+      <input type="time" id="m_hora" required>
+      <input type="number" id="m_pessoas" placeholder="Pessoas" required>
+
+      <button type="submit">Adicionar Reserva</button>
+    </form>
+
+    <hr>
+
+    <div id="listaReservas"></div>
+  </div>
+
+</div>
+
+<script src="admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<title>Gestão de Reservas</title>
+<style>
+  body { font-family: Arial; margin:0; padding:0; }
+  nav { background: #222; color: #fff; padding: 10px; text-align:center; }
+  nav button { margin: 0 5px; padding: 8px 16px; cursor: pointer; }
+  .container { padding: 20px; }
+  .admin, .cliente, .login { display:none; }
+
+  /* Admin */
+  .section { background: #f4f4f4; padding: 20px; margin-bottom: 20px; border-radius: 8px; }
+  table { width: 100%; border-collapse: collapse; margin-top:10px; }
+  table, th, td { border: 1px solid #ccc; }
+  th, td { padding: 8px; text-align: center; }
+  button { padding: 8px 16px; margin-top: 10px; cursor: pointer; }
+
+  /* Cliente */
+  .cliente { background: #121212; color: #fff; display:block; }
+  .cliente input, .cliente select, .cliente textarea, .cliente button { 
+    width: 100%; margin:5px 0; padding:10px; border-radius:5px; border:none; 
+  }
+  .cliente button { background: orange; color: #fff; cursor:pointer; }
+  .logo { text-align: center; margin-bottom: 20px; }
+
+  /* Form compacto */
+  .form-box { max-width: 400px; margin: auto; }
+</style>
+</head>
+<body>
+
+<nav>
+  <button onclick="mostrarLogin()">Admin</button>
+  <button onclick="mostrarCliente()">Cliente</button>
+</nav>
+
+<div class="container">
+
+<!-- LOGIN ADMIN -->
+<div class="login">
+  <h2>Login Administrador</h2>
+  <input type="password" id="senhaAdmin" placeholder="Password">
+  <button onclick="loginAdmin()">Entrar</button>
+</div>
+
+<!-- ADMIN -->
+<div class="admin">
+  <h1>Painel do Administrador</h1>
+
+  <div class="section">
+    <h2>Calendário Google</h2>
+    <input type="text" id="calendarioID" placeholder="ID do Google Calendar">
+    <button onclick="guardarCalendario()">Guardar Calendário</button>
+  </div>
+
+  <!-- Horários -->
+  <div class="section">
+    <h2>Configuração de Horários</h2>
+    <label><input type="checkbox" id="seg">Seg</label>
+    <label><input type="checkbox" id="ter">Ter</label>
+    <label><input type="checkbox" id="qua">Qua</label>
+    <label><input type="checkbox" id="qui">Qui</label>
+    <label><input type="checkbox" id="sex">Sex</label>
+    <label><input type="checkbox" id="sab">Sáb</label>
+    <label><input type="checkbox" id="dom">Dom</label>
+    <br><br>
+    Almoço: Início <input type="time" id="almocoInicio"> Fim <input type="time" id="almocoFim"><br>
+    Jantar: Início <input type="time" id="jantarInicio"> Fim <input type="time" id="jantarFim"><br>
+    <button onclick="salvarHorarios()">Guardar Horários</button>
+  </div>
+
+  <!-- Salas e Mesas -->
+  <div class="section">
+    <h2>Salas e Mesas</h2>
+    <table id="tabelaMesas">
+      <tr>
+        <th>Mesa</th><th>Nº Lugares</th><th>Editar</th><th>Eliminar</th>
+      </tr>
+    </table>
+    <button onclick="adicionarMesa()">Adicionar Mesa</button>
+  </div>
+</div>
+
+<!-- CLIENTE -->
+<div class="cliente">
+  <div class="logo">
+    <img src="logo.png" alt="Logo" width="150">
+  </div>
+
+  <h1>Reserva de Mesa</h1>
+  <div class="form-box">
+    <form id="formReserva">
+      <input type="text" placeholder="Nome" id="nome" required>
+      <input type="tel" placeholder="Telefone" id="telefone" required>
+      <input type="email" placeholder="Email" id="email" required>
+      <input type="number" placeholder="Nº de Pessoas" id="pessoas" min="1" required>
+      <input type="date" id="data" required>
+      <input type="time" id="hora" required>
+      <textarea placeholder="Observações (opcional)" id="obs"></textarea>
+      <button type="submit">Enviar Reserva</button>
+    </form>
+  </div>
+</div>
+
+</div>
+
+<script>
+// === Mostrar páginas ===
+function mostrarLogin(){ document.querySelector('.login').style.display='block'; document.querySelector('.cliente').style.display='none'; document.querySelector('.admin').style.display='none'; }
+function mostrarAdmin(){ document.querySelector('.login').style.display='none'; document.querySelector('.cliente').style.display='none'; document.querySelector('.admin').style.display='block'; }
+function mostrarCliente(){ document.querySelector('.login').style.display='none'; document.querySelector('.cliente').style.display='block'; document.querySelector('.admin').style.display='none'; }
+
+// === Login admin ===
+const PASSWORD_ADMIN = "1234"; // mudar para password real
+function loginAdmin(){
+  let senha = document.getElementById('senhaAdmin').value;
+  if(senha === PASSWORD_ADMIN){ mostrarAdmin(); } else { alert("Password incorreta!"); }
+}
+
+// === Calendário Google ===
+function guardarCalendario(){
+  let cal = document.getElementById('calendarioID').value;
+  localStorage.setItem('calendarioID', cal);
+  alert("Calendário guardado!");
+}
+
+// === Mesas ===
+let mesas = [];
+function adicionarMesa() {
+  let mesaNum = prompt("Número da Mesa:");
+  let lugares = prompt("Número de Lugares:");
+  if(mesaNum && lugares){
+    mesas.push({mesa: mesaNum, lugares: parseInt(lugares)});
+    renderMesas();
+  }
+}
+
+function renderMesas() {
+  let tabela = document.getElementById('tabelaMesas');
+  tabela.innerHTML = '<tr><th>Mesa</th><th>Nº Lugares</th><th>Editar</th><th>Eliminar</th></tr>';
+  mesas.forEach((m, i)=>{
+    let row = tabela.insertRow();
+    row.insertCell(0).innerText = m.mesa;
+    row.insertCell(1).innerText = m.lugares;
+    row.insertCell(2).innerHTML = `<button onclick="editarMesa(${i})">✏️</button>`;
+    row.insertCell(3).innerHTML = `<button onclick="eliminarMesa(${i})">🗑️</button>`;
+  });
+}
+
+function editarMesa(index){
+  let novaMesa = prompt("Novo número da mesa:", mesas[index].mesa);
+  let novosLugares = prompt("Novo número de lugares:", mesas[index].lugares);
+  if(novaMesa && novosLugares){
+    mesas[index] = {mesa: novaMesa, lugares: parseInt(novosLugares)};
+    renderMesas();
+  }
+}
+
+function eliminarMesa(index){
+  mesas.splice(index, 1);
+  renderMesas();
+}
+
+// === Horários ===
+function salvarHorarios(){
+  let dias = ['seg','ter','qua','qui','sex','sab','dom'].map(id => document.getElementById(id).checked);
+  let almocoInicio = document.getElementById('almocoInicio').value;
+  let almocoFim = document.getElementById('almocoFim').value;
+  let jantarInicio = document.getElementById('jantarInicio').value;
+  let jantarFim = document.getElementById('jantarFim').value;
+  let config = {dias, almocoInicio, almocoFim, jantarInicio, jantarFim, mesas};
+  localStorage.setItem('configRestaurante', JSON.stringify(config));
+  alert("Configurações guardadas!");
+}
+
+// === Formulário Cliente com validação ===
+document.getElementById('formReserva').addEventListener('submit', function(e){
+  e.preventDefault();
+  let config = JSON.parse(localStorage.getItem('configRestaurante') || '{}');
+  let reservas = JSON.parse(localStorage.getItem('reservas') || '[]');
+
+  let reserva = {
+    nome: document.getElementById('nome').value,
+    telefone: document.getElementById('telefone').value,
+    email: document.getElementById('email').value,
+    pessoas: parseInt(document.getElementById('pessoas').value),
+    data: document.getElementById('data').value,
+    hora: document.getElementById('hora').value,
+    obs: document.getElementById('obs').value
+  };
+
+  // Validação de horários e lotação
+  if(!config.dias) { alert("Administrador ainda não configurou o sistema."); return; }
+  let diaSemana = new Date(reserva.data).getDay(); // 0=Dom, 1=Seg...
+  if(!config.dias[diaSemana === 0 ? 6 : diaSemana-1]) { alert("Dia fechado para reservas."); return; }
+
+  let hora = reserva.hora;
+  if((hora < config.almocoInicio || hora > config.almocoFim) && (hora < config.jantarInicio || hora > config.jantarFim)) {
+    alert("Fora do horário permitido."); return;
+  }
+
+  // Verificar se existe espaço suficiente
+  let totalPessoas = reservas.filter(r=>r.data===reserva.data && r.hora===reserva.hora)
+                             .reduce((acc,r)=>acc+r.pessoas,0);
+  let capacidade = mesas.reduce((acc,m)=>acc+m.lugares,0);
+  if(totalPessoas + reserva.pessoas > capacidade){
+    alert("Não há espaço disponível neste horário."); return;
+  }
+
+  // Guardar reserva localmente
+  reservas.push(reserva);
+  localStorage.setItem('reservas', JSON.stringify(reservas));
+  alert("Reserva enviada com sucesso!");
+  this.reset();
+});
+</script>
+
+</body>
+</html>
