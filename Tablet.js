@@ -1,46 +1,33 @@
 const SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbxAQIi25t1ea_glXaF4HMVEkBTDdfao62jayjSWvFCav1K062Wp-oVoSfuwD_eu2zIk/exec";
 
+document.addEventListener("DOMContentLoaded", carregar);
+
 async function carregar() {
-  const res = await fetch(SCRIPT_URL + "?action=getReservas");
+  const res = await fetch(SCRIPT_URL + "?action=getReservasHoje");
   const reservas = await res.json();
 
-  const hoje = new Date().toISOString().slice(0, 10);
+  const div = document.getElementById("lista");
+  div.innerHTML = "";
 
-  almoco.innerHTML = "";
-  jantar.innerHTML = "";
+  reservas.forEach((r, i) => {
+    div.innerHTML += `
+      <div class="card">
+        <strong>${r.hora} – ${r.pessoas} ${r.nome}</strong><br>
+        Mesas: ${r.mesas.join(", ")}<br><br>
 
-  reservas
-    .filter(r => r.data === hoje)
-    .forEach((r, i) => {
-      const card = document.createElement("div");
-      card.className = "card";
-
-      card.innerHTML = `
-        <div class="card-info">
-          <strong>${r.pessoas} ${r.nome}</strong>
-          <span>${r.hora} · Mesas ${r.mesas?.join(", ") || ""}</span>
-          <div style="margin-top:10px; display:flex; gap:10px;">
-            <button onclick="estado(${i}, 'chegou')">Chegou</button>
-            <button onclick="estado(${i}, 'faltou')">Faltou</button>
-          </div>
-        </div>
-        <div class="card-icon">
-          ${r.origem === "cliente" ? "🍽" : "✍️"}
-        </div>
-      `;
-
-      (r.refeicao === "almoco" ? almoco : jantar).appendChild(card);
-    });
+        <button onclick="estado(${i}, 'chegou')">✅ Chegou</button>
+        <button onclick="estado(${i}, 'faltou')">❌ Faltou</button>
+      </div>
+    `;
+  });
 }
 
-async function estado(index, estado) {
+async function estado(i, estado) {
   await fetch(SCRIPT_URL + "?action=estadoReserva", {
     method: "POST",
-    body: JSON.stringify({ index, estado })
+    mode: "no-cors",
+    body: JSON.stringify({ index: i, estado })
   });
   carregar();
 }
-
-carregar();
-setInterval(carregar, 30000);
