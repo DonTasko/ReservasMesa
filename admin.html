@@ -1,82 +1,40 @@
-const SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbxAQIi25t1ea_glXaF4HMVEkBTDdfao62jayjSWvFCav1K062Wp-oVoSfuwD_eu2zIk/exec";
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <title>Painel de Administração</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+</head>
 
-let reservas = [];
+<body class="admin">
 
-document.addEventListener("DOMContentLoaded", () => {
-  if (sessionStorage.getItem("admin") === "ok") {
-    login.style.display = "none";
-    painel.style.display = "block";
-    carregarTudo();
-  }
-});
+<!-- LOGIN -->
+<div id="login" class="card login">
+  <h2>Área de Administração</h2>
+  <input
+    type="password"
+    id="password"
+    placeholder="Password"
+  >
+  <button onclick="loginAdmin()">Entrar</button>
+</div>
 
-async function loginAdmin() {
-  const res = await fetch(SCRIPT_URL + "?action=getConfig");
-  const cfg = await res.json();
+<!-- PAINEL -->
+<div id="painel" style="display:none">
 
-  if (password.value === cfg.admin.password) {
-    sessionStorage.setItem("admin", "ok");
-    login.style.display = "none";
-    painel.style.display = "block";
-    carregarTudo();
-  } else {
-    alert("Password incorreta");
-  }
-}
+  <header class="admin-header">
+    <h1>Reservas</h1>
+    <button onclick="logout()">Sair</button>
+  </header>
 
-async function carregarTudo() {
-  await carregarLotacao();
-  await carregarReservas();
-}
+  <section id="lotacao" class="card"></section>
+  <section id="listaReservas" class="card"></section>
 
-/* ===== LOTAÇÃO ===== */
+</div>
 
-async function carregarLotacao() {
-  const res = await fetch(SCRIPT_URL + "?action=getLotacao");
-  const l = await res.json();
+<!-- JS EXTERNO -->
+<script src="admin.js"></script>
 
-  lotacao.innerHTML = `
-    <div class="card">
-      <strong>Lotação Hoje</strong><br><br>
-      🍽 Almoço: ${l.almoco} / ${l.total}
-      <br>🌙 Jantar: ${l.jantar} / ${l.total}
-    </div>
-  `;
-}
-
-/* ===== RESERVAS ===== */
-
-async function carregarReservas() {
-  const res = await fetch(SCRIPT_URL + "?action=getReservas");
-  reservas = await res.json();
-  renderReservas();
-}
-
-function renderReservas() {
-  listaReservas.innerHTML = "";
-
-  reservas.forEach((r, i) => {
-    listaReservas.innerHTML += `
-      <div class="card">
-        <div>
-          <strong>${r.pessoas} ${r.nome}</strong><br>
-          ${r.data} · ${r.hora} · ${r.refeicao}
-        </div>
-        <button onclick="cancelar(${i})">❌</button>
-      </div>
-    `;
-  });
-}
-
-async function cancelar(i) {
-  if (!confirm("Cancelar reserva?")) return;
-
-  await fetch(SCRIPT_URL + "?action=cancelarReserva", {
-    method: "POST",
-    mode: "no-cors",
-    body: JSON.stringify(i)
-  });
-
-  carregarTudo();
-}
+</body>
+</html>
