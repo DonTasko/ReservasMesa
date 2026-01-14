@@ -23,9 +23,19 @@ async function carregarFuncionamento() {
    DATA
 ========================= */
 function diaSemana(data) {
-  return ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"]
-    [new Date(data + "T00:00:00").getDay()];
+  const dias = [
+    "domingo",
+    "segunda",
+    "terca",
+    "quarta",
+    "quinta",
+    "sexta",
+    "sabado"
+  ];
+
+  return dias[new Date(data + "T00:00:00").getDay()];
 }
+
 
 function validarData() {
   const dataInput = document.getElementById("data");
@@ -38,7 +48,8 @@ function validarData() {
 
   const dia = diaSemana(data);
 
-  if (!funcionamento[dia] || !funcionamento[dia].aberto) {
+  if (!funcionamento[dia]?.aberto) {
+
     alert("O restaurante encontra-se encerrado neste dia.");
     dataInput.value = "";
     return;
@@ -143,3 +154,4 @@ async function enviarReserva(e) {
     console.error(err);
   }
 }
+
