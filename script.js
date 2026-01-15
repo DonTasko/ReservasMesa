@@ -62,34 +62,25 @@ function validarData() {
    HORAS DISPONÍVEIS
 ========================= */
 async function atualizarHoras() {
-  const data = document.getElementById("data").value;
-  const refeicao = document.getElementById("refeicao").value;
-  const horaSelect = document.getElementById("hora");
+  hora.innerHTML = "";
 
-  horaSelect.innerHTML = "";
+  const dataEscolhida = document.getElementById("data").value;
+  const refeicaoEscolhida = refeicao.value;
 
-  if (!data) return;
-
-  if (!refeicao) {
-    const opt = document.createElement("option");
-    opt.textContent = "Escolhe a refeição primeiro";
-    opt.disabled = true;
-    horaSelect.appendChild(opt);
+  if (!dataEscolhida || !refeicaoEscolhida) {
+    hora.innerHTML = `<option>Escolhe a data</option>`;
     return;
   }
 
   try {
     const res = await fetch(
-      `${SCRIPT_URL}?action=getHoras&data=${data}&refeicao=${refeicao}`
+      `${SCRIPT_URL}?action=getHoras&data=${dataEscolhida}&refeicao=${refeicaoEscolhida}`
     );
 
     const horas = await res.json();
 
-    if (!Array.isArray(horas) || horas.length === 0) {
-      const opt = document.createElement("option");
-      opt.textContent = "Sem disponibilidade";
-      opt.disabled = true;
-      horaSelect.appendChild(opt);
+    if (!horas.length) {
+      hora.innerHTML = `<option>Sem disponibilidade</option>`;
       return;
     }
 
@@ -97,15 +88,14 @@ async function atualizarHoras() {
       const o = document.createElement("option");
       o.value = h;
       o.textContent = h;
-      horaSelect.appendChild(o);
+      hora.appendChild(o);
     });
 
-  } catch (e) {
-    alert("Erro ao carregar horários");
-    console.error(e);
+  } catch (err) {
+    console.error(err);
+    hora.innerHTML = `<option>Erro ao carregar horários</option>`;
   }
 }
-
 /* =========================
    ENVIAR RESERVA
 ========================= */
@@ -154,4 +144,5 @@ async function enviarReserva(e) {
     console.error(err);
   }
 }
+
 
