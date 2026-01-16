@@ -99,29 +99,7 @@ async function enviarReserva(e) {
 
   try {
     const res = await fetch(url);
-    const res = await fetch(url);
-const text = await res.text();
-
-console.log("📨 RESPOSTA RAW:", text);
-
-if (!text) {
-  alert("Reserva criada, mas sem resposta do servidor.");
-  form.reset();
-  limparHoras();
-  return;
-}
-
-const json = JSON.parse(text);
-
-if (!json.ok) {
-  alert(json.erro || "Erro ao enviar reserva");
-  return;
-}
-
-alert("Reserva confirmada 🍽️");
-form.reset();
-limparHoras();
-
+    const json = await res.json();
 
     if (!json.ok) {
       alert(json.erro || "Erro ao enviar reserva");
@@ -148,4 +126,3 @@ document.addEventListener("DOMContentLoaded", async () => {
   refeicaoSelect.addEventListener("change", carregarHoras);
   form.addEventListener("submit", enviarReserva);
 });
-
