@@ -1,5 +1,5 @@
 const SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycby9CrKTCh6HPNaQ3E7Dceg0XI0r2Lsjk_0_C2_T7oQrmLlVLxTGUtYDqhaBiCg93PSUeg/exec";
+  "https://script.google.com/macros/s/AKfycbwrfyQkCCJO3hrejeOuZazT4eGV5YT0AuetO0K2xr3BHeZJ-RyFX_bfhhHKTD1KO0MYrw/exec";
 
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("form");
@@ -96,3 +96,4 @@ async function enviarReserva(e) {
     alert("Erro de ligação ao servidor");
   }
 }
+
