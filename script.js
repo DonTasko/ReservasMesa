@@ -4,29 +4,32 @@ const SCRIPT_URL =
 let funcionamento = {};
 
 document.addEventListener("DOMContentLoaded", async () => {
-  console.log("SCRIPT CARREGADO");
   await carregarFuncionamento();
 
   document.getElementById("data").addEventListener("change", validarDia);
   document.getElementById("refeicao").addEventListener("change", carregarHoras);
+  document.getElementById("form").addEventListener("submit", enviarReserva);
 });
 
+/*********************************
+ * FUNCIONAMENTO
+ *********************************/
 async function carregarFuncionamento() {
   const res = await fetch(SCRIPT_URL + "?action=getFuncionamento");
   funcionamento = await res.json();
-  console.log("FUNCIONAMENTO RECEBIDO:", funcionamento);
 }
 
+/*********************************
+ * VALIDAR DIA
+ *********************************/
 function validarDia() {
   const dataInput = document.getElementById("data");
   const data = dataInput.value;
   if (!data) return;
 
-  const dia = new Date(data + "T00:00:00").getDay(); // 0–6
-  console.log("Dia escolhido:", dia);
-  console.log("Funcionamento dia:", funcionamento[dia]);
+  const dia = new Date(data + "T00:00:00").getDay();
 
-  if (!funcionamento[dia] || !funcionamento[dia].aberto) {
+  if (!funcionamento[dia]?.aberto) {
     alert("O restaurante encontra-se encerrado neste dia.");
     dataInput.value = "";
     limparHoras();
@@ -36,6 +39,9 @@ function validarDia() {
   carregarHoras();
 }
 
+/*********************************
+ * CARREGAR HORAS
+ *********************************/
 async function carregarHoras() {
   const data = document.getElementById("data").value;
   const refeicao = document.getElementById("refeicao").value;
@@ -45,36 +51,59 @@ async function carregarHoras() {
 
   if (!data || !refeicao) return;
 
-  try {
-    const res = await fetch(
-      `${SCRIPT_URL}?action=getHoras&data=${data}&refeicao=${refeicao}`
-    );
+  const res = await fetch(
+    `${SCRIPT_URL}?action=getHoras&data=${data}&refeicao=${refeicao}`
+  );
+  const horas = await res.json();
 
-    const horas = await res.json();
-    console.log("Horas recebidas:", horas);
-
-    if (!horas.length) {
-      const opt = document.createElement("option");
-      opt.textContent = "Sem disponibilidade";
-      opt.disabled = true;
-      opt.selected = true;
-      horaSelect.appendChild(opt);
-      return;
-    }
-
-    horas.forEach(h => {
-      const o = document.createElement("option");
-      o.value = h;
-      o.textContent = h;
-      horaSelect.appendChild(o);
-    });
-
-  } catch (e) {
-    console.error("Erro horários:", e);
-    alert("Erro ao carregar horários");
+  if (!horas.length) {
+    const opt = document.createElement("option");
+    opt.textContent = "Sem disponibilidade";
+    opt.disabled = true;
+    opt.selected = true;
+    horaSelect.appendChild(opt);
+    return;
   }
+
+  horas.forEach(h => {
+    const o = document.createElement("option");
+    o.value = h;
+    o.textContent = h;
+    horaSelect.appendChild(o);
+  });
 }
 
 function limparHoras() {
   document.getElementById("hora").innerHTML = "";
+}
+
+/*********************************
+ * ENVIAR RESERVA
+ *********************************/
+async function enviarReserva(e) {
+  e.preventDefault();
+
+  const reserva = {
+    nome: nome.value.trim(),
+    telefone: telefone.value.trim(),
+    data: data.value,
+    refeicao: refeicao.value,
+    hora: hora.value,
+    pessoas: parseInt(pessoas.value, 10)
+  };
+
+  if (!reserva.nome || !reserva.telefone || !reserva.data || !reserva.hora) {
+    alert("Preenche todos os campos");
+    return;
+  }
+
+  await fetch(SCRIPT_URL + "?action=novaReserva", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(reserva)
+  });
+
+  alert("Reserva efetuada com sucesso!");
+  e.target.reset();
+  limparHoras();
 }
