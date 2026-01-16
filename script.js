@@ -86,12 +86,14 @@ async function enviarReserva(e) {
 
   try {
     const res = await fetch(url);
+
+    // ⚠️ aqui estava o erro antes
     const json = await res.json();
 
-    console.log("RESPOSTA:", json);
+    console.log("Resposta backend:", json);
 
-    if (!json.ok) {
-      alert(json.erro || "Erro ao criar reserva");
+    if (!json || json.ok !== true) {
+      alert(json?.erro || "Erro ao enviar a reserva");
       return;
     }
 
@@ -100,13 +102,7 @@ async function enviarReserva(e) {
     limparHoras();
 
   } catch (err) {
-    console.error(err);
-    alert("Erro ao enviar reserva");
+    console.error("ERRO FETCH:", err);
+    alert("Erro de ligação ao servidor");
   }
 }
-
-
-
-
-
-
