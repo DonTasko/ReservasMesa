@@ -62,13 +62,19 @@ async function carregarHoras() {
 ========================= */
 async function enviarReserva(e) {
   e.preventDefault();
+  console.log("👉 enviarReserva chamada");
 
-  const nome = nomeInput.value.trim();
-  const telefone = telefoneInput.value.trim();
-  const data = dataInput.value;
-  const refeicao = refeicaoSelect.value;
-  const hora = horaSelect.value;
-  const pessoas = pessoasInput.value;
+  const nome = document.getElementById("nome").value.trim();
+  const telefone = document.getElementById("telefone").value.trim();
+  const data = document.getElementById("data").value;
+  const refeicao = document.getElementById("refeicao").value;
+  const hora = document.getElementById("hora").value;
+  const pessoas = document.getElementById("pessoas").value;
+
+  if (!nome || !telefone || !data || !refeicao || !hora || !pessoas) {
+    alert("Preenche todos os campos");
+    return;
+  }
 
   const url =
     `${SCRIPT_URL}?action=novaReserva` +
@@ -79,23 +85,23 @@ async function enviarReserva(e) {
     `&hora=${hora}` +
     `&pessoas=${pessoas}`;
 
+  console.log("📡 URL:", url);
+
   try {
     const res = await fetch(url);
 
-    if (!res.ok) throw new Error("HTTP " + res.status);
-
     const text = await res.text();
-    console.log("Resposta RAW:", text);
+    console.log("📨 Resposta servidor:", text);
 
-    alert("Reserva confirmada com sucesso 🍽️");
-    form.reset();
-    limparHoras();
+    alert("Reserva confirmada 🍽️");
+    document.getElementById("formReserva").reset();
 
   } catch (err) {
-    console.error("ERRO FETCH:", err);
+    console.error("❌ ERRO FETCH:", err);
     alert("Erro de ligação ao servidor");
   }
 }
+
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("formReserva");
 
@@ -106,5 +112,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   form.addEventListener("submit", enviarReserva);
 });
+
 
 
