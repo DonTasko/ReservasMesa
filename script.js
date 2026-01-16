@@ -1,5 +1,5 @@
 const SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbxpVkbtbh4Z5mQrnMniHrDHu-IE-9hs2Nc_FNjBkZ3dnLp9jDzOsWXI4VfDD8FwOcqMYA/exec";
+  "https://script.google.com/macros/s/AKfycbzAvav3gLXLfxKLrPlFHbI-6IEgbrVxVSytNfV4VfJdZhSOcc11rB0NCw6t8z0CL7nc6A/exec";
 
 let funcionamento = {};
 
@@ -107,3 +107,4 @@ async function enviarReserva(e) {
   e.target.reset();
   limparHoras();
 }
+
