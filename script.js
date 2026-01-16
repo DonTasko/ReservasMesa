@@ -63,17 +63,12 @@ async function carregarHoras() {
 async function enviarReserva(e) {
   e.preventDefault();
 
-  const nome = document.getElementById("nome").value.trim();
-  const telefone = document.getElementById("telefone").value.trim();
-  const data = document.getElementById("data").value;
-  const refeicao = document.getElementById("refeicao").value;
-  const hora = document.getElementById("hora").value;
-  const pessoas = document.getElementById("pessoas").value;
-
-  if (!nome || !telefone || !data || !refeicao || !hora || !pessoas) {
-    alert("Preenche todos os campos");
-    return;
-  }
+  const nome = nomeInput.value.trim();
+  const telefone = telefoneInput.value.trim();
+  const data = dataInput.value;
+  const refeicao = refeicaoSelect.value;
+  const hora = horaSelect.value;
+  const pessoas = pessoasInput.value;
 
   const url =
     `${SCRIPT_URL}?action=novaReserva` +
@@ -87,18 +82,13 @@ async function enviarReserva(e) {
   try {
     const res = await fetch(url);
 
-    // ⚠️ aqui estava o erro antes
-    const json = await res.json();
+    if (!res.ok) throw new Error("HTTP " + res.status);
 
-    console.log("Resposta backend:", json);
-
-    if (!json || json.ok !== true) {
-      alert(json?.erro || "Erro ao enviar a reserva");
-      return;
-    }
+    const text = await res.text();
+    console.log("Resposta RAW:", text);
 
     alert("Reserva confirmada com sucesso 🍽️");
-    document.getElementById("form").reset();
+    form.reset();
     limparHoras();
 
   } catch (err) {
