@@ -24,9 +24,7 @@ function validarDia() {
   const data = dataInput.value;
   if (!data) return;
 
-  const dia = new Date(data + "T00:00:00")
-    .toLocaleDateString("pt-PT", { weekday: "long" })
-    .replace(/^./, l => l.toUpperCase());
+  const dia = new Date(data + "T00:00:00").getDay(); // 0–6
 
   if (!funcionamento[dia]?.aberto) {
     alert("O restaurante encontra-se encerrado neste dia.");
@@ -109,3 +107,4 @@ async function enviarReserva(e) {
     alert("Erro ao efetuar reserva");
   }
 }
+
