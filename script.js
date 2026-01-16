@@ -64,40 +64,53 @@ async function enviarReserva(e) {
   e.preventDefault();
 
   const reserva = {
-    nome: nome.value.trim(),
-    telefone: telefone.value.trim(),
-    data: data.value,
-    refeicao: refeicao.value,
-    hora: hora.value,
-    pessoas: parseInt(pessoas.value),
+    nome: document.getElementById("nome").value.trim(),
+    telefone: document.getElementById("telefone").value.trim(),
+    data: document.getElementById("data").value,
+    refeicao: document.getElementById("refeicao").value,
+    hora: document.getElementById("hora").value,
+    pessoas: Number(document.getElementById("pessoas").value),
     origem: "cliente"
   };
 
-  if (!reserva.nome || !reserva.telefone || !reserva.data || !reserva.hora) {
+  if (
+    !reserva.nome ||
+    !reserva.telefone ||
+    !reserva.data ||
+    !reserva.refeicao ||
+    !reserva.hora ||
+    !reserva.pessoas
+  ) {
     alert("Preenche todos os campos");
     return;
   }
 
   try {
-    const res = await fetch(`${SCRIPT_URL}?action=novaReserva`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(reserva)
-    });
+    const res = await fetch(
+      SCRIPT_URL + "?action=novaReserva",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(reserva)
+      }
+    );
 
-    const r = await res.json();
+    const json = await res.json();
+    console.log("RESPOSTA BACKEND:", json);
 
-    if (r.ok) {
-      alert("Reserva confirmada!");
-      document.getElementById("form").reset();
-      document.getElementById("hora").innerHTML = "";
-    } else {
-      alert(r.erro || "Erro na reserva");
+    if (!json.ok) {
+      alert(json.erro || "Erro ao criar reserva");
+      return;
     }
 
+    alert("Reserva confirmada com sucesso 🍽️");
+    document.getElementById("form").reset();
+    limparHoras();
+
   } catch (err) {
+    console.error("ERRO FETCH:", err);
     alert("Erro ao enviar reserva");
-    console.error(err);
   }
 }
+
 
