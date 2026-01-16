@@ -2,14 +2,19 @@ const SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbwzEyIUG0SGMD6myPiUw4wH77fNT0tois8VzavcC2X_X2yVGEkeT_FFjb9v6Sx66WvFXw/exec";
 
 document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("data").addEventListener("change", carregarHoras);
-  document.getElementById("refeicao").addEventListener("change", carregarHoras);
-  document.getElementById("form").addEventListener("submit", enviarReserva);
+  const form = document.getElementById("form");
+  const dataInput = document.getElementById("data");
+  const refeicao = document.getElementById("refeicao");
+  const hora = document.getElementById("hora");
+
+  dataInput.addEventListener("change", carregarHoras);
+  refeicao.addEventListener("change", carregarHoras);
+  form.addEventListener("submit", enviarReserva);
 });
 
-/*********************************
- * CARREGAR HORAS (ÚNICA VALIDAÇÃO)
- *********************************/
+/* =========================
+   CARREGAR HORAS
+========================= */
 async function carregarHoras() {
   const data = document.getElementById("data").value;
   const refeicao = document.getElementById("refeicao").value;
@@ -19,32 +24,45 @@ async function carregarHoras() {
 
   if (!data || !refeicao) return;
 
-  const res = await fetch(
-    `${SCRIPT_URL}?action=getHoras&data=${data}&refeicao=${refeicao}&_=${Date.now()}`
-  );
+  const optLoading = document.createElement("option");
+  optLoading.textContent = "A carregar horários...";
+  optLoading.disabled = true;
+  optLoading.selected = true;
+  horaSelect.appendChild(optLoading);
 
-  const horas = await res.json();
+  try {
+    const res = await fetch(
+      `${SCRIPT_URL}?action=getHoras&data=${data}&refeicao=${refeicao}`
+    );
+    const horas = await res.json();
 
-  if (!Array.isArray(horas) || horas.length === 0) {
-    const opt = document.createElement("option");
-    opt.textContent = "Sem disponibilidade";
-    opt.disabled = true;
-    opt.selected = true;
-    horaSelect.appendChild(opt);
-    return;
+    horaSelect.innerHTML = "";
+
+    if (!horas.length) {
+      const opt = document.createElement("option");
+      opt.textContent = "Sem disponibilidade";
+      opt.disabled = true;
+      opt.selected = true;
+      horaSelect.appendChild(opt);
+      return;
+    }
+
+    horas.forEach(h => {
+      const o = document.createElement("option");
+      o.value = h;
+      o.textContent = h;
+      horaSelect.appendChild(o);
+    });
+
+  } catch (e) {
+    alert("Erro ao carregar horários");
+    console.error(e);
   }
-
-  horas.forEach(h => {
-    const o = document.createElement("option");
-    o.value = h;
-    o.textContent = h;
-    horaSelect.appendChild(o);
-  });
 }
 
-/*********************************
- * ENVIAR RESERVA
- *********************************/
+/* =========================
+   ENVIAR RESERVA
+========================= */
 async function enviarReserva(e) {
   e.preventDefault();
 
@@ -54,7 +72,8 @@ async function enviarReserva(e) {
     data: data.value,
     refeicao: refeicao.value,
     hora: hora.value,
-    pessoas: parseInt(pessoas.value, 10)
+    pessoas: parseInt(pessoas.value),
+    origem: "cliente"
   };
 
   if (!reserva.nome || !reserva.telefone || !reserva.data || !reserva.hora) {
@@ -62,21 +81,25 @@ async function enviarReserva(e) {
     return;
   }
 
-  const res = await fetch(SCRIPT_URL + "?action=novaReserva", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(reserva)
-  });
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=novaReserva`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(reserva)
+    });
 
-  const r = await res.json();
+    const r = await res.json();
 
-  if (r.erro) {
-    alert(r.erro);
-    return;
+    if (r.ok) {
+      alert("Reserva confirmada!");
+      document.getElementById("form").reset();
+      document.getElementById("hora").innerHTML = "";
+    } else {
+      alert(r.erro || "Erro na reserva");
+    }
+
+  } catch (err) {
+    alert("Erro ao enviar reserva");
+    console.error(err);
   }
-
-  alert("Reserva efetuada com sucesso!");
-  e.target.reset();
-  document.getElementById("hora").innerHTML = "";
 }
-
