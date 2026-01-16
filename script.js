@@ -1,3 +1,5 @@
+console.log("SCRIPT CARREGADO");
+
 const SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbxpVkbtbh4Z5mQrnMniHrDHu-IE-9hs2Nc_FNjBkZ3dnLp9jDzOsWXI4VfDD8FwOcqMYA/exec";
 
@@ -107,4 +109,5 @@ async function enviarReserva(e) {
     alert("Erro ao efetuar reserva");
   }
 }
+
 
