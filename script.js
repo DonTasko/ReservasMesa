@@ -17,9 +17,11 @@ document.addEventListener("DOMContentLoaded", async () => {
    FUNCIONAMENTO
 ========================= */
 async function carregarFuncionamento() {
-  const res = await fetch(`${SCRIPT_URL}?action=getFuncionamento`);
+  const res = await fetch(SCRIPT_URL + "?action=getFuncionamento");
   funcionamento = await res.json();
+  console.log("FUNCIONAMENTO RECEBIDO:", funcionamento);
 }
+
 
 function validarDia() {
   const dataInput = document.getElementById("data");
@@ -109,5 +111,6 @@ async function enviarReserva(e) {
     alert("Erro ao efetuar reserva");
   }
 }
+
 
 
