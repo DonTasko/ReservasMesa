@@ -1,5 +1,5 @@
 const SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbxpVkbtbh4Z5mQrnMniHrDHu-IE-9hs2Nc_FNjBkZ3dnLp9jDzOsWXI4VfDD8FwOcqMYA/exec";
+  "https://script.google.com/macros/s/AKfycbwzEyIUG0SGMD6myPiUw4wH77fNT0tois8VzavcC2X_X2yVGEkeT_FFjb9v6Sx66WvFXw/exec";
 
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("data").addEventListener("change", carregarHoras);
@@ -79,3 +79,4 @@ async function enviarReserva(e) {
   e.target.reset();
   document.getElementById("hora").innerHTML = "";
 }
+
