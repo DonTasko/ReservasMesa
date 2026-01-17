@@ -108,49 +108,41 @@ function limparHoras() {
 async function enviarReserva(e) {
   e.preventDefault();
 
-  console.log("👉 enviarReserva chamada");
+  const nome = document.getElementById("nome").value.trim();
+  const telefone = document.getElementById("telefone").value.trim();
+  const data = document.getElementById("data").value;
+  const refeicao = document.getElementById("refeicao").value;
+  const hora = document.getElementById("hora").value;
+  const pessoas = document.getElementById("pessoas").value;
 
-  const reserva = {
-    nome: document.getElementById("nome").value.trim(),
-    telefone: document.getElementById("telefone").value.trim(),
-    data: document.getElementById("data").value,
-    refeicao: document.getElementById("refeicao").value,
-    hora: document.getElementById("hora").value,
-    pessoas: parseInt(document.getElementById("pessoas").value),
-  };
-
-  if (!reserva.nome || !reserva.telefone || !reserva.data || !reserva.hora || !reserva.pessoas) {
+  if (!nome || !telefone || !data || !hora || !pessoas) {
     alert("⚠️ Preenche todos os campos");
     return;
   }
 
+  const url =
+    `${SCRIPT_URL}?action=novaReserva` +
+    `&nome=${encodeURIComponent(nome)}` +
+    `&telefone=${encodeURIComponent(telefone)}` +
+    `&data=${data}` +
+    `&refeicao=${refeicao}` +
+    `&hora=${hora}` +
+    `&pessoas=${pessoas}`;
+
+  console.log("📡 URL:", url);
+
   try {
-    const res = await fetch(SCRIPT_URL + "?action=novaReserva", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(reserva)
-    });
-
-    const text = await res.text();
-    console.log("📨 RESPOSTA RAW:", text);
-
-    if (!text) {
-      alert("✅ Reserva confirmada!");
-      limparHoras();
-      document.getElementById("form").reset();
-      return;
-    }
-
-    const json = JSON.parse(text);
+    const res = await fetch(url);
+    const json = await res.json();
 
     if (!json.ok) {
       alert(json.erro || "Erro ao enviar reserva");
       return;
     }
 
-    alert("✅ Reserva confirmada!");
-    limparHoras();
+    alert("✅ Reserva confirmada com sucesso!");
     document.getElementById("form").reset();
+    limparHoras();
 
   } catch (err) {
     console.error("❌ ERRO FETCH:", err);
