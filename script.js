@@ -13,21 +13,27 @@ console.log("🚀 Sistema iniciado");
 // ===============================
 function jsonp(url) {
   return new Promise((resolve, reject) => {
-    const cb = "cb_" + Math.random().toString(36).substring(2);
+    const callbackName = "cb_" + Date.now();
 
-    window[cb] = data => {
+    window[callbackName] = data => {
       resolve(data);
-      delete window[cb];
+      delete window[callbackName];
       script.remove();
     };
 
     const script = document.createElement("script");
-    script.src = `${url}&callback=${cb}`;
-    script.onerror = reject;
+    script.src = url + "&callback=" + callbackName;
+
+    script.onerror = () => {
+      reject(new Error("Erro ao carregar JSONP"));
+      delete window[callbackName];
+      script.remove();
+    };
 
     document.body.appendChild(script);
   });
 }
+
 
 // ===============================
 // CARREGAR FUNCIONAMENTO
@@ -165,5 +171,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   form.addEventListener("submit", enviarReserva);
 });
+
 
 
