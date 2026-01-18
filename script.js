@@ -114,50 +114,27 @@ function limparHoras() {
 async function enviarReserva(e) {
   e.preventDefault();
 
-  const nome = document.getElementById("nome").value.trim();
-  const telefone = document.getElementById("telefone").value.trim();
-  const data = document.getElementById("data").value;
-  const refeicao = document.getElementById("refeicao").value;
-  const hora = document.getElementById("hora").value;
-  const pessoas = document.getElementById("pessoas").value;
+  const params = new URLSearchParams({
+    action: "novaReserva",
+    nome: nome.value,
+    telefone: telefone.value,
+    data: data.value,
+    refeicao: refeicao.value,
+    hora: hora.value,
+    pessoas: pessoas.value
+  });
 
-  if (!nome || !telefone || !data || !hora || !pessoas) {
-    alert("⚠️ Preenche todos os campos");
-    return;
-  }
+  const url = `${SCRIPT_URL}?${params.toString()}`;
+  console.log("📡 ENVIAR:", url);
 
-  const url =
-    `${SCRIPT_URL}?action=novaReserva` +
-    `&nome=${encodeURIComponent(nome)}` +
-    `&telefone=${encodeURIComponent(telefone)}` +
-    `&data=${data}` +
-    `&refeicao=${refeicao}` +
-    `&hora=${hora}` +
-    `&pessoas=${pessoas}`;
+  const res = await fetch(url, { method: "POST" });
+  const json = await res.json();
 
-  console.log("📡 URL:", url);
+  console.log("📥 RESPOSTA:", json);
 
-  try {
-    const res = await fetch(url);
-    const json = await res.json();
-
-    if (!json.ok) {
-      alert(json.erro || "Erro ao enviar reserva");
-      return;
-    }
-
-    alert("✅ Reserva confirmada com sucesso!");
-    document.getElementById("form").reset();
-    limparHoras();
-
-  } catch (err) {
-    console.error("❌ ERRO FETCH:", err);
-    alert("Erro de ligação ao servidor");
+  if (json.ok) {
+    alert("✅ Reserva confirmada!");
+  } else {
+    alert(json.erro || "Erro ao enviar reserva");
   }
 }
-
-
-
-
-
-
