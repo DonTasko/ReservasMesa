@@ -2,7 +2,7 @@
 // CONFIG
 // ===============================
 const SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbyLVll7EUtcWYKCEnxaFSXWAlr4jmx6lBWyMmGI0BhFQ2pRRw5y8Q1DqGUm0V-TFTioTg/exec";
+  "https://script.google.com/macros/s/AKfycbzkt8v1wcoS4s4H_1INn9Y5AGL_02X_du8jIxcWKL6qscZfziwR0eH84hNkmwbMJCF8IA/exec";
 
 let funcionamento = {};
 
@@ -165,4 +165,5 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   form.addEventListener("submit", enviarReserva);
 });
+
 
