@@ -1,4 +1,4 @@
-// ===============================
+// ================================
 // CONFIG
 // ===============================
 const SCRIPT_URL =
@@ -165,3 +165,4 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   form.addEventListener("submit", enviarReserva);
 });
+
